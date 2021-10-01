@@ -1,10 +1,12 @@
-MOV A,B
-MOV B,A
-MOV A,B
-MOV B,A
-MOV A,B
-MOV B,A
-MOV A,B
-MOV B,A
-MOV A,B
-MOV B,A
+CODE:
+    MOV A,B
+    MOV B,A
+    MOV A,B
+    MOV B,A
+    MOV A,B
+    MOV B,A
+    MOV A,B
+ JGE comparar
+este: JGE comparar
+    MOV A,B
+    MOV B,A
