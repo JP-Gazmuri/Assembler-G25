@@ -13,6 +13,7 @@ def clean_parameters(line):
 
 def std_no_label(line):
     stdline = {'inlabel':"",'function':"",'arg1':"",'arg2':"",'outlabel':""}
+    label_using_functions = ["JMP","JEQ","JNE","JGT","JLT","JGE","JLE","JCR","JOV"]
     if line[0] == " " and line.find(':') == -1:
         if line.find(',') == -1:
             two_arg = False
@@ -43,9 +44,12 @@ def std_no_label(line):
                 else:
                     stdline['arg2'] += line[i]
                     i += 1
-            if not two_arg:
+            elif stdline['function'] in label_using_functions:
                 stdline['outlabel'] += line[i]
                 i+=1
+            else:
+                stdline['arg1'] += line[i]
+                i += 1
     stdline = clean_parameters(stdline)
     return stdline
 
