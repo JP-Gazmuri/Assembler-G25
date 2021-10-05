@@ -5,6 +5,7 @@ siguiente:
   MOV B,(B)
   CMP A,B
   JGE comparar
+  JGE #10
   MOV (aux),A
   MOV A,B
   MOV B,(aux)
