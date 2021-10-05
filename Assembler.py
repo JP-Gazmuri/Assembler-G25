@@ -1,6 +1,8 @@
 from validation_functions import *
 from reading_functions import *
 
+
+file = input("escriba el nombre del archivo (en el mismo directorio) a revisar: \n")
 start_of_CODE = 1
 file = open("Example.ass", "r", encoding = "utf-8")
 instructions = []
