@@ -73,30 +73,32 @@ def function_validation(line,combinations , position):
 
     if "AoBy(Dir)" in combinations:
         if  line['arg1'] == "A" or line['arg1'] == "B":
-            if line['arg2'].find("#") == -1:
+            dir = line['arg2'].strip("()")
+            if dir.find("#") == -1:
                 try:
-                    int(line['arg2'])
+                    int(dir)
                     return True
                 except ValueError:
                     pass
             else:
                 try:
-                    hex_to_dec(line['arg2'])
+                    hex_to_dec(dir)
                     return True
                 except ValueError:
                     pass
     
     if "(Dir)yAoB" in combinations:
         if  line['arg2'] == "A" or line['arg2'] == "B":
-            if line['arg1'].find("#") == -1:
+            dir = line['arg1'].strip("()")
+            if dir.find("#") == -1:
                 try:
-                    int(line['arg1'])
+                    int(dir)
                     return True
                 except ValueError:
                     pass
             else:
                 try:
-                    hex_to_dec(line['arg1'])
+                    hex_to_dec(dir)
                     return True
                 except ValueError:
                     pass
@@ -115,15 +117,16 @@ def function_validation(line,combinations , position):
     
     if "Dir" in combinations:
         if line['arg2'] == "":
-            if line['arg1'].find("#") == -1:
+            dir = line['arg1'].strip("()")
+            if dir.find("#") == -1:
                 try:
-                    int(line['arg1'])
+                    int(dir)
                     return True
                 except ValueError:
                     pass
             else:
                 try:
-                    hex_to_dec(line['arg1'])
+                    hex_to_dec(dir)
                     return True
                 except ValueError:
                     pass
@@ -147,7 +150,6 @@ def function_validation(line,combinations , position):
     if "A" in combinations:
         if (line['arg1'] == "A" or line['arg1'] == "B") and line['arg2'] == "":
             return True
-    
     print(f"Error en linea {position}: Los argumentos no cumplen la logica para la funcion {line['function']}")
     return False
 
@@ -158,7 +160,7 @@ def logic_validation(lines, start_of_CODE):
     answer = True
     for line in lines:
         if line['function'] != "" and line['function'] not in not_validated_functions:
-            if function_validation(line,posible_arguments[line['function']],i):
+            if not function_validation(line,posible_arguments[line['function']],i):
                 answer = False
         i+=1
     return answer
