@@ -154,12 +154,32 @@ def function_validation(line,combinations , position):
     return False
 
 def logic_validation(lines, start_of_CODE):
-    not_validated_functions = ["JMP","JEQ","JNE","JGT","JLT","JGE","JLE","JCR","JOV","CALL","RET"]
-    posible_arguments = {"MOV":["AyB","AoByLit","AoBy(Dir)","(Dir)yAoB","AoBy(B)","(B)yA"],"ADD":["AyB","AoByLit","AoBy(Dir)","Ay(B)","Dir"],"SUB":["AyB","AoByLit","AoBy(Dir)","Ay(B)","Dir"],"AND":["AyB","AoByLit","AoBy(Dir)","Ay(B)","Dir"],"OR":["AyB","AoByLit","AoBy(Dir)","Ay(B)","Dir"],"NOT":["AyB","2AoB","(Dir)yAoB","(B)"],"XOR":["AyB","AoByLit","AoBy(Dir)","Ay(B)","Dir"],"SHL":["AyB","2AoB","(Dir)yAoB","(B)"],"INC":["B","Dir","(B)"],"RST":["Dir","(B)"],"CMP":["onlyA,B","AoByLit","AoBy(Dir)","Ay(B)"],"PUSH":["A"],"POP":["A"]}
+    posible_arguments = {}
+    posible_arguments['MOV'] = ["A,B","B,A","A,Lit","B,Lit","A,Dir","B,Dir","Dir,A","Dir,B","A,(B)","B,(B)","(B),A"]
+    posible_arguments['ADD'] = ["A,B","B,A","A,Lit","B,Lit","A,Dir","B,Dir","A,(B)","Dir"]
+    posible_arguments['SUB'] = ["A,B","B,A","A,Lit","B,Lit","A,Dir","B,Dir","A,(B)","Dir"]
+    posible_arguments['AND'] = ["A,B","B,A","A,Lit","B,Lit","A,Dir","B,Dir","A,(B)","Dir"]
+    posible_arguments['OR'] = ["A,B","B,A","A,Lit","B,Lit","A,Dir","B,Dir","A,(B)","Dir"]
+    posible_arguments['NOT'] = ["A,A","A,B","B,A","B,B","Dir,A","Dir,B","(B)"]
+    posible_arguments['XOR'] = ["A,B","B,A","A,Lit","B,Lit","A,Dir","B,Dir","A,(B)","Dir"]
+    posible_arguments['SHL'] = ["A,A","A,B","B,A","B,B","Dir,A","Dir,B","(B)"]
+    posible_arguments['SHR'] = ["A,A","A,B","B,A","B,B","Dir,A","Dir,B","(B)"]
+    posible_arguments['INC'] = ["B","Dir","(B)"]
+    posible_arguments['RST'] = ["Dir","(B)"]
+    posible_arguments['CMP'] = ["A,B","A,Lit","B,Lit","A,Dir","B,Dir","A,(B)"]
+    posible_arguments['PUSH'] = ["A","B"]
+    posible_arguments['POP'] = ["A","B"]
+    all_arguments = []
+    for argument in posible_arguments.keys():
+        for arg in posible_arguments[argument]:
+            all_arguments.append(arg)
+    all_arguments = list(dict.fromkeys(all_arguments))
+    print(all_arguments)
+    return 0
     i = start_of_CODE
     answer = True
     for line in lines:
-        if line['function'] != "" and line['function'] not in not_validated_functions:
+        if line['function'] != "" and line['function'] in posible_arguments.keys():
             if not function_validation(line,posible_arguments[line['function']],i):
                 answer = False
         i+=1
