@@ -2,6 +2,76 @@ def hex_to_dec(number):
     new = number.strip("#")
     return int(new,16)
 
+def validate_literal(value,position,message):
+    if value.find('#') == -1:
+        try:
+            number = int(value)
+            if 0 <= number < 256:
+                return True
+            elif number < 0:
+                message[0] = True
+                print(f"Error en linea {position}: El literal {value} no puede ser negativo")
+                return False
+            else:
+                message[0] = True
+                print(f"Error en linea {position}: El literal {value} sobrepasa el maximo valor posible (255)")
+                return False
+        except ValueError:
+            return False
+    else:
+        try:
+            number = hex_to_dec(value)
+            if  0 <= number < 256:
+                return True
+            elif number < 0:
+                message[0] = True
+                print(f"Error en linea {position}: El literal {value} no puede ser negativo")
+                return False
+            else:
+                message[0] = True
+                print(f"Error en linea {position}: El literal {value} sobrepasa el maximo valor posible (255)")
+                return False
+        except ValueError:
+            return False
+
+def direction_validation(value,position,message):
+    if value[0] == "(" and value[-1] == ")":
+        direction = value.strip("()")
+        if direction.find('#') == -1:
+            try:
+                number = int(direction)
+                if 0 <= number < 256:
+                    return True
+                elif number < 0:
+                    message[0] = True
+                    print(f"Error en linea {position}: La direccion {value} no puede ser negativa")
+                    return False
+                else:
+                    message[0] = True
+                    print(f"Error en linea {position}: La direccion {value} sobrepasa el maximo valor posible (255)")
+                    return False
+            except ValueError:
+                return False
+        else:
+            try:
+                number = hex_to_dec(direction)
+                if 0 <= number < 256:
+                    return True
+                elif number < 0:
+                    message[0] = True
+                    print(f"Error en linea {position}: La direccion {value} no puede ser negativa")
+                    return False
+                else:
+                    message[0] = True
+                    print(f"Error en linea {position}: La direccion {value} sobrepasa el maximo valor posible (255)")
+                    return False
+            except ValueError:
+                return False
+    else:
+        return False
+
+                
+
 def validate_labels(instructions , start_of_CODE):
     inlabels = []
     outlabels = []
@@ -27,6 +97,9 @@ def validate_labels(instructions , start_of_CODE):
                 if position > lenght:
                     correct = False
                     print(f"Error en la línea numero {outlbl[1]}: La direccion {outlbl[0]} sobrepasa el largo del codigo")
+                elif position > 255:
+                    correct = False
+                    print(f"Error en la línea numero {outlbl[1]}: La direccion {outlbl[0]} sobrepasa el valor maximo de 255")
             except ValueError:
                 correct = False
                 print(f"Error en la línea numero {outlbl[1]}: La etiqueta {outlbl[0]} no es declarada")
@@ -50,107 +123,94 @@ def validate_functions_syntax(lines, start_of_CODE):
     return correct
 
 def function_validation(line,combinations , position):
-    if "AyB" in combinations:
+    message = [False]
+    if "A,B" in combinations:
         if line['arg1'] == "A" and line['arg2'] == "B":
+            line['arguments'] = "A,B"
             return True
-        elif line['arg1'] == "B" and line['arg2'] == "A":
-            return True
-
-    if "AoByLit" in combinations:
-        if  line['arg1'] == "A" or line['arg1'] == "B":
-            if line['arg2'].find("#") == -1:
-                try:
-                    int(line['arg2'])
-                    return True
-                except ValueError:
-                    pass
-            else:
-                try:
-                    hex_to_dec(line['arg2'])
-                    return True
-                except ValueError:
-                    pass
-
-    if "AoBy(Dir)" in combinations:
-        if  line['arg1'] == "A" or line['arg1'] == "B":
-            dir = line['arg2'].strip("()")
-            if dir.find("#") == -1:
-                try:
-                    int(dir)
-                    return True
-                except ValueError:
-                    pass
-            else:
-                try:
-                    hex_to_dec(dir)
-                    return True
-                except ValueError:
-                    pass
     
-    if "(Dir)yAoB" in combinations:
-        if  line['arg2'] == "A" or line['arg2'] == "B":
-            dir = line['arg1'].strip("()")
-            if dir.find("#") == -1:
-                try:
-                    int(dir)
-                    return True
-                except ValueError:
-                    pass
-            else:
-                try:
-                    hex_to_dec(dir)
-                    return True
-                except ValueError:
-                    pass
-    
-    if "AoBy(B)" in combinations:
-        if (line['arg1'] == "A" or line['arg1'] == "B") and line['arg2'] == "(B)":
+    if "B,A" in combinations:
+        if line['arg1'] == "B" and line['arg2'] == "A":
+            line['arguments'] = "B,A"
             return True
 
-    if "(B)yA" in combinations:
+    if "A,Lit" in combinations:
+        if line['arg1'] == "A" and validate_literal(line['arg2'],position,message):
+            line['arguments'] = "A,Lit"
+            return True
+    
+    if "B,Lit" in combinations:
+        if line['arg1'] == "B" and validate_literal(line['arg2'],position,message):
+            line['arguments'] = "B,Lit"
+            return True
+    
+    if "A,(B)" in combinations:
+        if line['arg1'] == "A" and line['arg2'] == "(B)":
+            line['arguments'] = "A,(B)"
+            return True
+    
+    if "B,(B)" in combinations:
+        if line['arg1'] == "B" and line['arg2'] == "(B)":
+            line['arguments'] = "B,(B)"
+            return True
+    
+    if "(B),A" in combinations:
         if line['arg1'] == "(B)" and line['arg2'] == "A":
+            line['arguments'] = "(B),A"
             return True
     
-    if "Ay(B)" in combinations:
-        if line['arg1'] == "A" and line['arg2'] == "B":
-            return True
-    
-    if "Dir" in combinations:
-        if line['arg2'] == "":
-            dir = line['arg1'].strip("()")
-            if dir.find("#") == -1:
-                try:
-                    int(dir)
-                    return True
-                except ValueError:
-                    pass
-            else:
-                try:
-                    hex_to_dec(dir)
-                    return True
-                except ValueError:
-                    pass
-    
-    if "2AoB" in combinations:
-        if line['arg1'] == line['arg2'] and (line['arg1'] == "A" or line['arg1'] == "B"):
+    if "A,A" in combinations:
+        if line['arg1'] == "A" and line['arg2'] == "A":
+            line['arguments'] = "A,A"
             return True
 
+    if "B,B" in combinations:
+        if line['arg1'] == "B" and line['arg2'] == "B":
+            line['arguments'] = "B,B"
+            return True
+        
     if "(B)" in combinations:
         if line['arg1'] == "(B)" and line['arg2'] == "":
+            line['arguments'] = "(B)"
             return True
     
     if "B" in combinations:
         if line['arg1'] == "B" and line['arg2'] == "":
-            return True
-
-    if "onlyA,B" in combinations:
-        if line['arg1'] == "A" and line['arg2'] == "B":
+            line['arguments'] = "B"
             return True
     
     if "A" in combinations:
-        if (line['arg1'] == "A" or line['arg1'] == "B") and line['arg2'] == "":
+        if line['arg1'] == "A" and line['arg2'] == "":
+            line['arguments'] = "A"
             return True
-    print(f"Error en linea {position}: Los argumentos no cumplen la logica para la funcion {line['function']}")
+
+    if "A,Dir" in combinations:
+        if line['arg1'] == "A" and direction_validation(line['arg2'],position,message):
+            line['arguments'] = "A,Dir"
+            return True
+    
+    if "B,Dir" in combinations:
+        if line['arg1'] == "B" and direction_validation(line['arg2'],position,message):
+            line['arguments'] = "B,Dir"
+            return True
+    
+    if "Dir,A" in combinations:
+        if direction_validation(line['arg1'],position,message) and line['arg2'] == "A":
+            line['arguments'] = "Dir,A"
+            return True
+    
+    if "Dir,B" in combinations:
+        if direction_validation(line['arg1'],position,message) and line['arg2'] == "B":
+            line['arguments'] = "Dir,B"
+            return True
+    
+    if "Dir" in combinations:
+        if direction_validation(line['arg1'],position,message) and line['arg2'] == "":
+            line['arguments'] = "Dir"
+            return True
+
+    if not message[0]:
+        print(f"Error en linea {position}: Los argumentos no cumplen la logica para la funcion {line['function']}")
     return False
 
 def logic_validation(lines, start_of_CODE):
@@ -169,19 +229,22 @@ def logic_validation(lines, start_of_CODE):
     posible_arguments['CMP'] = ["A,B","A,Lit","B,Lit","A,Dir","B,Dir","A,(B)"]
     posible_arguments['PUSH'] = ["A","B"]
     posible_arguments['POP'] = ["A","B"]
-    all_arguments = []
-    for argument in posible_arguments.keys():
-        for arg in posible_arguments[argument]:
-            all_arguments.append(arg)
-    all_arguments = list(dict.fromkeys(all_arguments))
-    print(all_arguments)
-    return 0
     i = start_of_CODE
     answer = True
     for line in lines:
-        if line['function'] != "" and line['function'] in posible_arguments.keys():
+        if line['function'] in posible_arguments.keys():
             if not function_validation(line,posible_arguments[line['function']],i):
                 answer = False
         i+=1
     return answer
 
+
+def full_validation(lines,start_of_CODE):
+    ret = True
+    if not validate_labels(lines,start_of_CODE):
+        ret = False
+    if not validate_functions_syntax(lines,start_of_CODE):
+        ret = False
+    if not logic_validation(lines,start_of_CODE):
+        ret = False
+    return ret

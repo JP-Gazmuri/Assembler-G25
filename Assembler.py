@@ -13,10 +13,7 @@ for line in file:
         instructions.append(standarize_line(line))
 
 
-if not validate_labels(instructions,start_of_CODE):
-    validation = False
-
-if not logic_validation(instructions,start_of_CODE):
+if not full_validation(instructions,start_of_CODE):
     validation = False
 
 if validation:
