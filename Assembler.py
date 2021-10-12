@@ -23,6 +23,7 @@ if not full_validation(instructions,start_of_CODE):
 
 if validation:
     output = full_write_file(instructions,data)
+    len_out = len(output)
 else:
     print("No sera compilado debido a errores")
 
@@ -34,11 +35,11 @@ if validation:
         outfile.write("\n")
     outfile.close()
 
-len_out = len(output)
 
-print(f"{len_data} lineas de datos en el archivo original")
-print(f"{len_code} lineas de codigo en el archivo original")
-print(f"{len_out} lineas de instrucciones en el archivo de salida")
+if validation:
+    print(f"{len_data} lineas de datos en el archivo original")
+    print(f"{len_code} lineas de codigo en el archivo original")
+    print(f"{len_out} lineas de instrucciones en el archivo de salida")
 
 
 file.close()
