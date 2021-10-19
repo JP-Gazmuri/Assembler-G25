@@ -197,6 +197,20 @@ def write_instruction(line):
         return "1011010"
     if line['function'] == 'JOV':
         return "1011011"
+    if line['function'] == 'CALL':
+        return "1011100"
+    if line['function'] == 'RET':
+        return "1011101"
+    if line['function'] == 'PUSH':
+        if line['arguments'] == 'A':
+            return "1011110"
+        elif line['arguments'] == 'B':
+            return "1011111"
+    if line['function'] == 'POP':
+        if line['arguments'] == 'A':
+            return "1100000"
+        elif line['arguments'] == 'B':
+            return "1100001"
 
 def write_file(instructions,data):
     final = []
@@ -230,6 +244,8 @@ def filter_lines(lines):
 def lit_to_8bit(value):
     if value.find('#') == -1:
         number = int(value)
+        if number < 0:
+            number = 256 + number
         binary = format(number,"b")
         while len(binary) < 8:
             binary = "0" + binary
@@ -241,13 +257,8 @@ def lit_to_8bit(value):
             binary = "0" + binary
         return binary
 
-def direction_from_data(value,data):
-    pass
-
 def dir_to_8bit(value,data):
-    if value.strip("()") in data:
-        return direction_from_data(value,data)
-    elif value.find("#") == -1:
+    if value.find("#") == -1:
         number = value.strip("()")
         number = int(number)
         binary = format(number,"b")

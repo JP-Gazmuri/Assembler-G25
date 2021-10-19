@@ -40,12 +40,8 @@ def direction_validation(value,position,message):
         if direction.find('#') == -1:
             try:
                 number = int(direction)
-                if 0 <= number < 256:
+                if -128 <= number < 256:
                     return True
-                elif number < 0:
-                    message[0] = True
-                    print(f"Error en linea {position}: La direccion {value} no puede ser negativa")
-                    return False
                 else:
                     message[0] = True
                     print(f"Error en linea {position}: La direccion {value} sobrepasa el maximo valor posible (255)")
@@ -55,12 +51,8 @@ def direction_validation(value,position,message):
         else:
             try:
                 number = hex_to_dec(direction)
-                if 0 <= number < 256:
+                if -128 <= number < 256:
                     return True
-                elif number < 0:
-                    message[0] = True
-                    print(f"Error en linea {position}: La direccion {value} no puede ser negativa")
-                    return False
                 else:
                     message[0] = True
                     print(f"Error en linea {position}: La direccion {value} sobrepasa el maximo valor posible (255)")
@@ -69,8 +61,6 @@ def direction_validation(value,position,message):
                 return False
     else:
         return False
-
-                
 
 def validate_labels(instructions , start_of_CODE):
     inlabels = []
@@ -110,9 +100,8 @@ def validate_labels(instructions , start_of_CODE):
                 print(f"Error en la línea numero {outlbl[1]}: La direccion {outlbl[0]} sobrepasa el largo del codigo")
     return correct
 
-
 def validate_functions_syntax(lines, start_of_CODE):
-    valid_functions = ["MOV","ADD","SUB","AND","OR","NOT","XOR","SHL","SHR","INC","RST","CMP","JMP","JEQ","JNE","JGT","JLT","JGE","JLE","JCR","JOV","CALL","RET","POP","PUSH"]
+    valid_functions = ["","MOV","ADD","SUB","AND","OR","NOT","XOR","SHL","SHR","INC","RST","CMP","JMP","JEQ","JNE","JGT","JLT","JGE","JLE","JCR","JOV","CALL","RET","POP","PUSH"]
     correct = True
     i = start_of_CODE
     for line in lines:
@@ -209,6 +198,10 @@ def function_validation(line,combinations , position):
             line['arguments'] = "Dir"
             return True
 
+    if "nothing" in combinations:
+        if line['arg1'] == "" and line['arg2'] == "":
+            return True
+
     if not message[0]:
         print(f"Error en linea {position}: Los argumentos no cumplen la logica para la funcion {line['function']}")
     return False
@@ -229,6 +222,7 @@ def logic_validation(lines, start_of_CODE):
     posible_arguments['CMP'] = ["A,B","A,Lit","B,Lit","A,Dir","B,Dir","A,(B)"]
     posible_arguments['PUSH'] = ["A","B"]
     posible_arguments['POP'] = ["A","B"]
+    posible_arguments['RET'] = ["nothing"]
     i = start_of_CODE
     answer = True
     for line in lines:
@@ -238,9 +232,45 @@ def logic_validation(lines, start_of_CODE):
         i+=1
     return answer
 
-
-def full_validation(lines,start_of_CODE):
+def validate_data(data):
+    i = 1
     ret = True
+    for dat in data:
+        if not len(dat) == 3:
+            print(f"Error en linea {i}: No es declarado un valor inicial de la variable {dat[0]}")
+            ret = False
+        elif not validate_literal(dat[1], i,[True]):
+            ret = False
+        elif dat[0] == "A":
+            print(f"Error en linea {i}: No se puede declarar una variable como A")
+            ret = False
+        elif dat[0] == "B":
+            print(f"Error en linea {i}: No se puede declarar una variable como B")
+            ret = False
+        elif dat[0].find("(") != -1:
+            print(f"Error en linea {i}: No se puede declarar una variable con parentesis")
+            ret = False
+        elif dat[0].find(")") != -1:
+            print(f"Error en linea {i}: No se puede declarar una variable con parentesis")
+            return False
+        try:
+            if dat[1].find("#") == -1:
+                if int(dat[1]) > 255 or int(dat[1]) < -128:
+                    print(f"Error en linea {i}: Valor de la variable fuera del rango permitido")
+                    return False
+            else:
+                if hex_to_dec(dat[1]) > 255 or hex_to_dec(dat[1]) < 0:
+                    print(f"Error en linea {i}: Valor de la variable fuera del rango permitido")
+                    return False
+        except ValueError:
+            print(f"Error en linea {i}: Valor de la variable no valido")
+        i+=1
+    return ret 
+
+def full_validation(lines,start_of_CODE,data):
+    ret = True
+    if not validate_data(data):
+        ret = False
     if not validate_labels(lines,start_of_CODE):
         ret = False
     if not validate_functions_syntax(lines,start_of_CODE):
@@ -248,4 +278,3 @@ def full_validation(lines,start_of_CODE):
     if not logic_validation(lines,start_of_CODE):
         ret = False
     return ret
-

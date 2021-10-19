@@ -81,4 +81,55 @@ def standarize_line(line):
     stdline = clean_parameters(stdline)
     return stdline
 
+def delete_lines(lines):
+    i = 0
+    while i < len(lines):
+        if lines[i]['function'] == "" and lines[i] != lines[-1]:
+            del lines[i]
+        i+=1
+
+def stack_labels(instructions):
+    i = 0
+    while i < len(instructions):
+        if instructions[i]['inlabel'] != "" and instructions[i]['function'] == "":
+            if i < len(instructions)-1:
+                instructions[i+1]['inlabel'] = instructions[i]['inlabel']
+        i+=1
+    delete_lines(instructions)
+
+def swap_variables(lines, data):
+    var = []
+    for d in data:
+        var.append(d[0])
+    
+    for line in lines:
+        if line['arg1'] in var:
+            line['arg1'] = str(var.index(line['arg1']))
+        if line['arg2'] in var:
+            line['arg2'] = str(var.index(line['arg2']))
+        if line['arg1'].strip("()") in var and len(line['arg1'].strip("()")) != len(line['arg1']):
+            arg = line['arg1'].strip("()")
+            line['arg1'] = f"({var.index(arg)})" 
+        if line['arg2'].strip("()") in var and len(line['arg2'].strip("()")) != len(line['arg2']):
+            arg = line['arg2'].strip("()")
+            line['arg2'] = f"({var.index(arg)})" 
+
+def value_labels(instructions):
+    i = 0
+    ret = {}
+    for instruction in instructions:
+        if instruction['inlabel'] != "":
+            ret[instruction['inlabel']] = i
+        i+=1
+    return ret
+
+
+
+def swap_labels(instructions):
+    labels = value_labels(instructions)
+    for instruction in instructions:
+        if instruction['outlabel'] in labels.keys():
+            instruction['outlabel'] = str(labels[instruction['outlabel']])
+
+        
 
