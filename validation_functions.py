@@ -234,42 +234,50 @@ def logic_validation(lines, start_of_CODE):
     return answer
 
 def validate_data(data):
-    i = 1
+    i = 2
     ret = True
     for dat in data:
         if not len(dat) == 2:
             print(f"Error en linea {i}: No es declarado un valor inicial de la variable {dat[0]}")
             ret = False
+            i+=1
             continue
         elif not validate_literal(dat[1], i,[True]):
             ret = False
+            i+=1
             continue
         elif dat[0] == "A":
             print(f"Error en linea {i}: No se puede declarar una variable como A")
             ret = False
+            i+=1
             continue
         elif dat[0] == "B":
             print(f"Error en linea {i}: No se puede declarar una variable como B")
             ret = False
+            i+=1
             continue
         elif dat[0].find("(") != -1:
             print(f"Error en linea {i}: No se puede declarar una variable con parentesis")
             ret = False
+            i+=1
             continue
         elif dat[0].find(")") != -1:
             print(f"Error en linea {i}: No se puede declarar una variable con parentesis")
             ret = False
+            i+=1
             continue
         try:
             if dat[1].find("#") == -1:
                 if int(dat[1]) > 255 or int(dat[1]) < -128:
                     print(f"Error en linea {i}: Valor de la variable fuera del rango permitido")
                     ret = False
+                    i+=1
                     continue
             else:
                 if hex_to_dec(dat[1]) > 255 or hex_to_dec(dat[1]) < 0:
                     print(f"Error en linea {i}: Valor de la variable fuera del rango permitido")
                     ret = False
+                    i+=1
                     continue
         except ValueError:
             print(f"Error en linea {i}: Valor de la variable no valido")
