@@ -6,11 +6,11 @@ def validate_literal(value,position,message):
     if value.find('#') == -1:
         try:
             number = int(value)
-            if 0 <= number < 256:
+            if -128 <= number < 256:
                 return True
-            elif number < 0:
+            elif number < -128:
                 message[0] = True
-                print(f"Error en linea {position}: El literal {value} no puede ser negativo")
+                print(f"Error en linea {position}: El literal {value} no puede ser negativo menor a -128")
                 return False
             else:
                 message[0] = True
@@ -200,6 +200,7 @@ def function_validation(line,combinations , position):
 
     if "nothing" in combinations:
         if line['arg1'] == "" and line['arg2'] == "":
+            line['arguments'] = 'nothing'
             return True
 
     if not message[0]:
