@@ -12,7 +12,7 @@ def clean_parameters(line):
     return line
 
 def std_no_label(line):
-    stdline = {'inlabel':"",'function':"",'arg1':"",'arg2':"",'outlabel':""}
+    stdline = {'inlabel':"",'function':"",'arg1':"",'arg2':"",'outlabel':"",'len':1}
     label_using_functions = ["JMP","JEQ","JNE","JGT","JLT","JGE","JLE","JCR","JOV","CALL"]
     if line[0] == " " and line.find(':') == -1:
         if line.find(',') == -1:
@@ -56,7 +56,7 @@ def std_no_label(line):
 
 
 def standarize_line(line):
-    stdline = {'inlabel':"",'function':"",'arg1':"",'arg2':"",'outlabel':""}
+    stdline = {'inlabel':"",'function':"",'arg1':"",'arg2':"",'outlabel':"",'len':1}
     if line[0] == " " and line.find(':') == -1:
         stdline = std_no_label(line)
     elif line.find(':') != -1:
@@ -94,6 +94,7 @@ def stack_labels(instructions):
         if instructions[i]['inlabel'] != "" and instructions[i]['function'] == "":
             if i < len(instructions)-1:
                 instructions[i+1]['inlabel'] = instructions[i]['inlabel']
+                instructions[i+1]['len'] = 2
         i+=1
     delete_lines(instructions)
 

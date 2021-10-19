@@ -228,41 +228,49 @@ def logic_validation(lines, start_of_CODE):
     answer = True
     for line in lines:
         if line['function'] in posible_arguments.keys():
-            if not function_validation(line,posible_arguments[line['function']],i):
+            if not function_validation(line,posible_arguments[line['function']],i+line['len']-1):
                 answer = False
-        i+=1
+        i+=line['len']
     return answer
 
 def validate_data(data):
     i = 1
     ret = True
     for dat in data:
-        if not len(dat) == 3:
+        if not len(dat) == 2:
             print(f"Error en linea {i}: No es declarado un valor inicial de la variable {dat[0]}")
             ret = False
+            continue
         elif not validate_literal(dat[1], i,[True]):
             ret = False
+            continue
         elif dat[0] == "A":
             print(f"Error en linea {i}: No se puede declarar una variable como A")
             ret = False
+            continue
         elif dat[0] == "B":
             print(f"Error en linea {i}: No se puede declarar una variable como B")
             ret = False
+            continue
         elif dat[0].find("(") != -1:
             print(f"Error en linea {i}: No se puede declarar una variable con parentesis")
             ret = False
+            continue
         elif dat[0].find(")") != -1:
             print(f"Error en linea {i}: No se puede declarar una variable con parentesis")
-            return False
+            ret = False
+            continue
         try:
             if dat[1].find("#") == -1:
                 if int(dat[1]) > 255 or int(dat[1]) < -128:
                     print(f"Error en linea {i}: Valor de la variable fuera del rango permitido")
-                    return False
+                    ret = False
+                    continue
             else:
                 if hex_to_dec(dat[1]) > 255 or hex_to_dec(dat[1]) < 0:
                     print(f"Error en linea {i}: Valor de la variable fuera del rango permitido")
-                    return False
+                    ret = False
+                    continue
         except ValueError:
             print(f"Error en linea {i}: Valor de la variable no valido")
         i+=1

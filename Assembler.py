@@ -13,14 +13,14 @@ validation = True
 i = 1
 for line in file:
     if line.strip() == "DATA:":
+        i+=1
         continue
     if line.strip() == "CODE:":
         in_code = True
-        start_of_CODE = i+2
+        start_of_CODE = i+1
         continue
     if not in_code:
         variable = line.strip().split(" ")
-        variable.append(i-1)
         data.append(variable)
     if in_code:
         instructions.append(standarize_line(line))
